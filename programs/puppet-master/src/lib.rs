@@ -9,7 +9,12 @@ declare_id!("Cryw1jkAGWFsBeEJLXEpQVsfT7HAFs6q4K4He7A6o5e7");
 mod puppet_master {
     use super::*;
     pub fn pull_strings(ctx: Context<PullStrings>, data: u64) -> Result<()> {
-        puppet::cpi::set_data(ctx.accounts.set_data_ctx(), data)
+        puppet::cpi::set_data(ctx.accounts.set_data_ctx(), data)?;
+        ctx.accounts.puppet.reload()?; // to reload the account
+        if ctx.accounts.puppet.data != 42 {
+            panic!();
+        }
+        Ok(())
     }
 }
 
