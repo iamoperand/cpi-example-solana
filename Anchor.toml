@@ -1,0 +1,15 @@
+[features]
+seeds = false
+[programs.localnet]
+puppet = "svhc8CJNjapum1PakZabGcdeVjc83uU92zVY1dpr5sE"
+puppet_master = "Cryw1jkAGWFsBeEJLXEpQVsfT7HAFs6q4K4He7A6o5e7"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "/Users/nikhil/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
