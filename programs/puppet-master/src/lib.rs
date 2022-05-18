@@ -18,6 +18,7 @@ pub struct PullStrings<'info> {
     #[account(mut)]
     pub puppet: Account<'info, Data>,
     pub puppet_program: Program<'info, Puppet>,
+    pub authority: Signer<'info>,
 }
 
 impl<'info> PullStrings<'info> {
@@ -25,6 +26,7 @@ impl<'info> PullStrings<'info> {
         let cpi_program = self.puppet_program.to_account_info();
         let cpi_accounts = SetData {
             puppet: self.puppet.to_account_info(),
+            authority: self.authority.to_account_info(),
         };
         CpiContext::new(cpi_program, cpi_accounts)
     }
