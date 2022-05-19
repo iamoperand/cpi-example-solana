@@ -10,10 +10,10 @@ pub mod puppet {
         Ok(())
     }
 
-    pub fn set_data(ctx: Context<SetData>, data: u64) -> Result<()> {
+    pub fn set_data(ctx: Context<SetData>, data: u64) -> Result<u64> {
         let puppet = &mut ctx.accounts.puppet;
         puppet.data = data;
-        Ok(())
+        Ok(data)
     }
 }
 
@@ -28,7 +28,7 @@ pub struct Initialize<'info> {
 
 #[derive(Accounts)]
 pub struct SetData<'info> {
-    #[account(mut)]
+    #[account(mut, has_one = authority)]
     pub puppet: Account<'info, Data>,
     pub authority: Signer<'info>,
 }
