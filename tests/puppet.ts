@@ -1,6 +1,6 @@
 import * as anchor from '@project-serum/anchor'
 import { Program } from '@project-serum/anchor'
-import { Keypair } from '@solana/web3.js'
+import { Keypair, PublicKey } from '@solana/web3.js'
 import { expect } from 'chai'
 
 import { Puppet } from '../target/types/puppet'
@@ -14,11 +14,12 @@ describe('puppet', () => {
   const puppetMasterProgram = anchor.workspace.PuppetMaster as Program<PuppetMaster>
 
   const puppetKeypair = Keypair.generate()
-  const authorityKeypair = Keypair.generate()
 
   it('Does CPI!', async () => {
+    const [puppetMasterPDA, puppetMasterBump] = await PublicKey.findProgramAddress([], puppetMasterProgram.programId)
+
     await puppetProgram.methods
-      .initialize(authorityKeypair.publicKey)
+      .initialize(puppetMasterPDA)
       .accounts({
         puppet: puppetKeypair.publicKey,
         user: provider.wallet.publicKey,
@@ -27,13 +28,12 @@ describe('puppet', () => {
       .rpc()
 
     await puppetMasterProgram.methods
-      .pullStrings(new anchor.BN(42))
+      .pullStrings(puppetMasterBump, new anchor.BN(42))
       .accounts({
         puppetProgram: puppetProgram.programId,
         puppet: puppetKeypair.publicKey,
-        authority: authorityKeypair.publicKey,
+        authority: puppetMasterPDA,
       })
-      .signers([authorityKeypair])
       .rpc()
 
     expect((await puppetProgram.account.data.fetch(puppetKeypair.publicKey)).data.toNumber()).to.equal(42)

@@ -8,8 +8,11 @@ declare_id!("Cryw1jkAGWFsBeEJLXEpQVsfT7HAFs6q4K4He7A6o5e7");
 #[program]
 mod puppet_master {
     use super::*;
-    pub fn pull_strings(ctx: Context<PullStrings>, data: u64) -> Result<()> {
-        puppet::cpi::set_data(ctx.accounts.set_data_ctx(), data)?;
+    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
+        puppet::cpi::set_data(
+            ctx.accounts.set_data_ctx().with_signer(&[&[&[bump][..]]]),
+            data,
+        )?;
         ctx.accounts.puppet.reload()?; // to reload the account
         if ctx.accounts.puppet.data != 42 {
             panic!();
@@ -23,7 +26,8 @@ pub struct PullStrings<'info> {
     #[account(mut)]
     pub puppet: Account<'info, Data>,
     pub puppet_program: Program<'info, Puppet>,
-    pub authority: Signer<'info>,
+    /// CHECK: only used as a signing PDA
+    pub authority: UncheckedAccount<'info>,
 }
 
 impl<'info> PullStrings<'info> {
